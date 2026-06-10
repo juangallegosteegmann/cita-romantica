@@ -223,36 +223,64 @@ function elegirComida(comida){
     finalizar();
 }
 
-function finalizar(){
-    const destinatario = "juangallegosteegmannpuente@gmail.com";
-    const asunto = "Nueva cita elegida 💖";
-
-    let mensaje = `
-Fecha: ${fechaElegida}
-Hora: ${horaElegida}
-Plan elegido: ${planElegido}
-`;
-
-    if(comidaElegida){
-        mensaje += `Comida elegida: ${comidaElegida}`;
-    }
-
-    const mailto = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`;
-
-    window.location.href = mailto;
-
+async function finalizar(){
     app.innerHTML = `
-        <h1 style="font-size:3rem;">👑 Eres una princess 👑</h1>
-        <p style="font-size:1.5rem;color:#d63384;">
-            Tu cita ha quedado elegida 💖
-        </p>
-        <p style="margin-top:20px;font-size:1.1rem;">
-            Fecha: <strong>${fechaElegida}</strong><br>
-            Hora: <strong>${horaElegida}</strong><br>
-            Plan: <strong>${planElegido}</strong><br>
-            ${comidaElegida ? "Comida: <strong>" + comidaElegida + "</strong>" : ""}
+        <h2>Enviando tu cita... 💌</h2>
+        <p style="color:#d63384;font-size:1.2rem;">
+            Un segundito, princess 💖
         </p>
     `;
+
+    try {
+        const respuesta = await fetch("https://formspree.io/f/mvznqywg", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                fecha: fechaElegida,
+                hora: horaElegida,
+                plan: planElegido,
+                comida: comidaElegida || "No aplica"
+            })
+        });
+
+        if(!respuesta.ok){
+            throw new Error("No se pudo enviar el formulario");
+        }
+
+        app.innerHTML = `
+            <h1 style="font-size:3rem;">👑 Eres una princess 👑</h1>
+            <p style="font-size:1.5rem;color:#d63384;">
+                Tu cita ha sido enviada correctamente 💖
+            </p>
+            <p style="margin-top:20px;font-size:1.1rem;">
+                Fecha: <strong>${fechaElegida}</strong><br>
+                Hora: <strong>${horaElegida}</strong><br>
+                Plan: <strong>${planElegido}</strong><br>
+                ${comidaElegida ? "Comida: <strong>" + comidaElegida + "</strong>" : ""}
+            </p>
+        `;
+    } catch(error) {
+        console.error("Error Formspree:", error);
+
+        app.innerHTML = `
+            <h1 style="font-size:3rem;">👑 Eres una princess 👑</h1>
+            <p style="font-size:1.5rem;color:#d63384;">
+                Tu cita ha quedado elegida 💖
+            </p>
+            <p style="margin-top:20px;font-size:1.1rem;">
+                Fecha: <strong>${fechaElegida}</strong><br>
+                Hora: <strong>${horaElegida}</strong><br>
+                Plan: <strong>${planElegido}</strong><br>
+                ${comidaElegida ? "Comida: <strong>" + comidaElegida + "</strong><br>" : ""}
+            </p>
+            <p style="margin-top:20px;color:#d63384;">
+                No se pudo enviar el correo automáticamente. Revisa Formspree y vuelve a intentarlo.
+            </p>
+        `;
+    }
 }
 
 function crearFlor(){
