@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cita conmigo</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial, sans-serif;
+    overflow:hidden;
+    background:
+        linear-gradient(rgba(255,240,245,.45), rgba(255,240,245,.45)),
+        url("https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=1920&q=80");
+    background-size:cover;
+    background-position:center;
+}
+
+.container{
+    text-align:center;
+    background:rgba(255,255,255,.85);
+    padding:40px;
+    border-radius:25px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    max-width:700px;
+}
+
+h1,h2{
+    color:#d63384;
+    margin-bottom:25px;
+}
+
+button{
+    border:none;
+    border-radius:15px;
+    padding:15px 30px;
+    font-size:1.1rem;
+    cursor:pointer;
+    margin:10px;
+}
+
+#si,.opcion,.finalizar{
+    background:#ff4d88;
+    color:white;
+}
+
+#no{
+    background:#666;
+    color:white;
+    position:fixed;
+    left:60%;
+    top:55%;
+    z-index:999;
+}
+
+input{
+    padding:12px;
+    margin:10px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    font-size:1rem;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:15px;
+}
+
+.opcion{
+    padding:20px;
+    border-radius:18px;
+}
+
+.seleccionada{
+    background:#b5175a !important;
+    transform:scale(1.05);
+}
+
+.corazon{
+    position:fixed;
+    pointer-events:none;
+    animation:subir 6s linear forwards;
+}
+
+@keyframes subir{
+    from{
+        transform:translateY(100vh);
+        opacity:0;
+    }
+    20%{
+        opacity:1;
+    }
+    to{
+        transform:translateY(-120px);
+        opacity:0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="app">
+    <h1>🌹 ¿Quieres tener una cita conmigo? 🌹</h1>
+    <button id="si">Sí 💖</button>
+</div>
+
+<button id="no">No 😢</button>
+
+<script>
+const app = document.getElementById("app");
+const botonNo = document.getElementById("no");
+
+let fechaElegida = "";
+let horaElegida = "";
+let planElegido = "";
+let comidaElegida = "";
+
+document.addEventListener("mousemove", (e) => {
+    const rect = botonNo.getBoundingClientRect();
+
+    const centroX = rect.left + rect.width / 2;
+    const centroY = rect.top + rect.height / 2;
+
+    const distancia = Math.hypot(
+        e.clientX - centroX,
+        e.clientY - centroY
+    );
+
+    if (distancia < 150) {
+        const maxX = window.innerWidth - rect.width;
+        const maxY = window.innerHeight - rect.height;
+
+        botonNo.style.left = Math.random() * maxX + "px";
+        botonNo.style.top = Math.random() * maxY + "px";
+    }
+});
+
+document.getElementById("si").addEventListener("click", mostrarCalendario);
+
+function mostrarCalendario(){
+    botonNo.style.display = "none";
+
+    app.innerHTML = `
+        <h2>💖 Elige fecha y hora para nuestra cita 💖</h2>
+
+        <input type="date" id="fecha">
+        <input type="time" id="hora">
+
+        <br>
+
+        <button class="finalizar" onclick="guardarFecha()">
+            Continuar 🌹
+        </button>
+    `;
+}
+
+function guardarFecha(){
+    fechaElegida = document.getElementById("fecha").value;
+    horaElegida = document.getElementById("hora").value;
+
+    if(!fechaElegida || !horaElegida){
+        alert("Elige fecha y hora, princess 💖");
+        return;
+    }
+
+    mostrarOpciones();
+}
+
+function mostrarOpciones(){
+    app.innerHTML = `
+        <h2>✨ Elige el plan ✨</h2>
+
+        <div class="grid">
+            <button class="opcion" onclick="elegirPlan('Paseito')">1. Paseito 🚶‍♀️</button>
+            <button class="opcion" onclick="elegirPlan('Comida')">2. Comida 🍽️</button>
+            <button class="opcion" onclick="elegirPlan('Pelis')">3. Pelis 🎬</button>
+            <button class="opcion" onclick="elegirPlan('Dormir')">4. Dormir 😴</button>
+            <button class="opcion" onclick="elegirPlan('Bañito')">5. Bañito 🛁</button>
+            <button class="opcion" onclick="elegirPlan('Escapada a Guadarrama')">6. Escapada a Guadarrama 🌲</button>
+        </div>
+    `;
+}
+
+function elegirPlan(plan){
+    planElegido = plan;
+
+    if(plan === "Comida"){
+        mostrarOpcionesComida();
+    } else {
+        finalizar();
+    }
+}
+
+function mostrarOpcionesComida(){
+    app.innerHTML = `
+        <h2>🍽️ Elige tipo de comida 🍽️</h2>
+
+        <div class="grid">
+            <button class="opcion" onclick="elegirComida('Italiano')">1. Italiano 🍝</button>
+            <button class="opcion" onclick="elegirComida('Pizzita')">2. Pizzita 🍕</button>
+            <button class="opcion" onclick="elegirComida('Shushi')">3. Shushi 🍣</button>
+            <button class="opcion" onclick="elegirComida('Cocina Juan')">4. Cocina Juan 👨‍🍳</button>
+        </div>
+    `;
+}
+
+function elegirComida(comida){
+    comidaElegida = comida;
+    finalizar();
+}
+
+function finalizar(){
+    const destinatario = "juangallegosteegmannpuente@gmail.com";
+    const asunto = "Nueva cita elegida 💖";
+
+    let mensaje = `
+Fecha: ${fechaElegida}
+Hora: ${horaElegida}
+Plan elegido: ${planElegido}
+`;
+
+    if(comidaElegida){
+        mensaje += `Comida elegida: ${comidaElegida}`;
+    }
+
+    const mailto = `mailto:${destinatario}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`;
+
+    window.location.href = mailto;
+
+    app.innerHTML = `
+        <h1 style="font-size:3rem;">👑 Eres una princess 👑</h1>
+        <p style="font-size:1.5rem;color:#d63384;">
+            Tu cita ha quedado elegida 💖
+        </p>
+        <p style="margin-top:20px;font-size:1.1rem;">
+            Fecha: <strong>${fechaElegida}</strong><br>
+            Hora: <strong>${horaElegida}</strong><br>
+            Plan: <strong>${planElegido}</strong><br>
+            ${comidaElegida ? "Comida: <strong>" + comidaElegida + "</strong>" : ""}
+        </p>
+    `;
+}
+
+function crearFlor(){
+    const flor = document.createElement("div");
+    flor.className = "corazon";
+    flor.innerHTML = Math.random() > 0.5 ? "🌹" : "🌸";
+    flor.style.left = Math.random() * window.innerWidth + "px";
+    flor.style.fontSize = (20 + Math.random()*30) + "px";
+
+    document.body.appendChild(flor);
+
+    setTimeout(() => {
+        flor.remove();
+    }, 6000);
+}
+
+setInterval(crearFlor, 500);
+</script>
+
+</body>
+</html>
